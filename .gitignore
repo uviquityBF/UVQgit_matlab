@@ -1,3 +1,7 @@
+# Windows thumbnail/metadata files
+desktop.ini
+Thumbs.db
+
 # MATLAB autosave files
 *.asv
 
