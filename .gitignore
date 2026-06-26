@@ -1,0 +1,15 @@
+# MATLAB autosave files
+*.asv
+
+# Compiled MEX files
+*.mex*
+*.mexw64
+*.mexmaci64
+*.mexa64
+
+# Simulink generated
+slprj/
+*.slxc
+
+# Temp/scratch
+temp.m
