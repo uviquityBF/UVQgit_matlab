@@ -1,0 +1,36 @@
+{
+  "description": "Guided mode dispersion dn_eff/d_lambda from COMSOL parametric sweeps. Pump mode = TM00 evaluated at lambda_pump; SH mode = TM04 evaluated at lambda_SH = lambda_pump/2. Units for dn_dWL are 1/nm.",
+  "medians": {
+    "dn_dWL_fund":   -0.001476,
+    "dn_dWL_target": -0.013490
+  },
+  "units": {
+    "h_core_nm":    "nm",
+    "w_core_nm":    "nm",
+    "dn_dWL_fund":  "1/nm  (d n_eff / d lambda, pump mode at lambda_pump)",
+    "dn_dWL_target":"1/nm  (d n_eff / d lambda, SH mode at lambda_SH)"
+  },
+  "data": [
+    {"h_core_nm": 350, "w_core_nm": 400, "dn_dWL_fund": -0.001537, "dn_dWL_target": -0.013427},
+    {"h_core_nm": 335, "w_core_nm": 400, "dn_dWL_fund": -0.001608, "dn_dWL_target": -0.014681},
+    {"h_core_nm": 365, "w_core_nm": 400, "dn_dWL_fund": -0.001464, "dn_dWL_target": -0.012275},
+    {"h_core_nm": 335, "w_core_nm": 375, "dn_dWL_fund": -0.001645, "dn_dWL_target": -0.014596},
+    {"h_core_nm": 350, "w_core_nm": 375, "dn_dWL_fund": -0.001575, "dn_dWL_target": -0.013166},
+    {"h_core_nm": 365, "w_core_nm": 375, "dn_dWL_fund": -0.001501, "dn_dWL_target": -0.012271},
+    {"h_core_nm": 335, "w_core_nm": 350, "dn_dWL_fund": -0.001687, "dn_dWL_target": -0.014524},
+    {"h_core_nm": 350, "w_core_nm": 350, "dn_dWL_fund": -0.001618, "dn_dWL_target": -0.013523},
+    {"h_core_nm": 350, "w_core_nm": 425, "dn_dWL_fund": -0.001504, "dn_dWL_target": -0.013490},
+    {"h_core_nm": 365, "w_core_nm": 425, "dn_dWL_fund": -0.001431, "dn_dWL_target": -0.012323},
+    {"h_core_nm": 350, "w_core_nm": 450, "dn_dWL_fund": -0.001476, "dn_dWL_target": -0.013552},
+    {"h_core_nm": 335, "w_core_nm": 475, "dn_dWL_fund": -0.001522, "dn_dWL_target": -0.014996},
+    {"h_core_nm": 350, "w_core_nm": 475, "dn_dWL_fund": -0.001451, "dn_dWL_target": -0.013070},
+    {"h_core_nm": 365, "w_core_nm": 475, "dn_dWL_fund": -0.001377, "dn_dWL_target": -0.012423},
+    {"h_core_nm": 350, "w_core_nm": 500, "dn_dWL_fund": -0.001428, "dn_dWL_target": -0.013663},
+    {"h_core_nm": 365, "w_core_nm": 500, "dn_dWL_fund": -0.001354, "dn_dWL_target": -0.012228},
+    {"h_core_nm": 335, "w_core_nm": 525, "dn_dWL_fund": -0.001480, "dn_dWL_target": -0.015029},
+    {"h_core_nm": 350, "w_core_nm": 525, "dn_dWL_fund": -0.001408, "dn_dWL_target": -0.013706},
+    {"h_core_nm": 365, "w_core_nm": 525, "dn_dWL_fund": -0.001334, "dn_dWL_target": -0.012507},
+    {"h_core_nm": 350, "w_core_nm": 550, "dn_dWL_fund": -0.001390, "dn_dWL_target": -0.013744},
+    {"h_core_nm": 365, "w_core_nm": 550, "dn_dWL_fund": -0.001316, "dn_dWL_target": -0.012540}
+  ]
+}
