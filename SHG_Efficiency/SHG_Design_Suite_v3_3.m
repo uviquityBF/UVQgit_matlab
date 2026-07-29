@@ -9,12 +9,17 @@ function SHG_Design_Suite_v3_3()
 %
 %     Taper struct fields for two-segment mode:
 %       cases(k).taper.L1_um        = 800;    % segment 1 fixed length [um]
-%       cases(k).taper.dw_per_mm_1  = 10.0;   % width taper rate in seg1 [nm/mm]
-%       cases(k).taper.dw_per_mm_2  =  0.0;   % width taper rate in seg2 [nm/mm]
+%       cases(k).taper.w_start_nm   = 300;    % width at waveguide input [nm]
+%       cases(k).taper.w_L1_nm      = 310;    % width at seg1/seg2 boundary [nm]
+%       cases(k).taper.w_end_nm     = 310;    % width at waveguide output [nm]
 %       cases(k).taper.dlam_PM_dw   = -0.012; % shared width PM sensitivity [nm/nm]
 %       cases(k).taper.dh_per_mm    = 3.0;    % height taper (global) [nm/mm]
 %       cases(k).taper.dlam_PM_dh   = 0.22;   % height PM sensitivity [nm/nm]
 %       cases(k).taper.lam_PM_0_nm  = 450.0;  % PM wavelength at z=0 [nm]
+%
+%     Seg1 rate = (w_L1_nm - w_start_nm) / L1_um  — fixed (L1 is constant).
+%     Seg2 rate = (w_end_nm - w_L1_nm) / (L - L1_um)  — computed per-L at runtime
+%     because seg2 length varies across the length sweep.
 %
 %     Cases without L1_um use a single dk profile (v3.2 behaviour, backward compat).
 %     If L <= L1_um, only segment 1 is simulated.
@@ -68,7 +73,7 @@ function SHG_Design_Suite_v3_3()
     cases(1).uv_loss_val      = 10;
     cases(1).dk_center        = 10;
     cases(1).dk_grad          = 0;
-    cases(1).a0_grad_dBcm_mm  = -10;
+    cases(1).a0_grad_dBcm_mm  = 0;
     cases(1).a3_grad_dBcm_mm  = 0;
 
     % --- CASE 2 ---
@@ -87,7 +92,7 @@ function SHG_Design_Suite_v3_3()
     cases(2).uv_loss_val      = 10;
     cases(2).dk_center        = 0;
     cases(2).dk_grad          = 0;
-    cases(2).a0_grad_dBcm_mm  = -10;
+    cases(2).a0_grad_dBcm_mm  = 0;
     cases(2).a3_grad_dBcm_mm  = 0;
     cases(2).taper.lam_PM_0_nm = 450.0;
     cases(2).taper.dlam_PM_dh  = 0.22;
@@ -149,7 +154,7 @@ function SHG_Design_Suite_v3_3()
     cases(5).uv_loss_val      = 10;
     cases(5).dk_center        = 0;
     cases(5).dk_grad          = 0;
-    cases(5).a0_grad_dBcm_mm  = -10;
+    cases(5).a0_grad_dBcm_mm  = 0;
     cases(5).a3_grad_dBcm_mm  = 0;
 
     % --- CASE 6 ---
@@ -168,7 +173,7 @@ function SHG_Design_Suite_v3_3()
     cases(6).uv_loss_val      = 10;
     cases(6).dk_center        = 0;
     cases(6).dk_grad          = 0;
-    cases(6).a0_grad_dBcm_mm  = -10;
+    cases(6).a0_grad_dBcm_mm  = 0;
     cases(6).a3_grad_dBcm_mm  = 0;
 
     % --- CASE 7: single-segment height taper (v3.2 reference) ---
@@ -187,13 +192,13 @@ function SHG_Design_Suite_v3_3()
     cases(7).uv_loss_val      = 10;
     cases(7).dk_center        = 0;
     cases(7).dk_grad          = 0;
-    cases(7).a0_grad_dBcm_mm  = -10;
+    cases(7).a0_grad_dBcm_mm  = 0;
     cases(7).a3_grad_dBcm_mm  = 0;
-    cases(7).taper.lam_PM_0_nm = 450.0;
-    cases(7).taper.dlam_PM_dh  = 0.22;
-    cases(7).taper.dlam_PM_dw  = -0.012;
-    cases(7).taper.dh_per_mm   = 3.0;
-    cases(7).taper.dw_per_mm   = 0.0;
+    %cases(7).taper.lam_PM_0_nm = 450.0;
+    %cases(7).taper.dlam_PM_dh  = 0.22;
+    %cases(7).taper.dlam_PM_dw  = -0.012;
+    %cases(7).taper.dh_per_mm   = 3.0;
+    %cases(7).taper.dw_per_mm   = 0.0;
 
     % --- CASE 8: two-segment width taper (v3.3 new feature) ---
     % Segment 1 (L1=800um): combined height + width chirp
@@ -217,12 +222,14 @@ function SHG_Design_Suite_v3_3()
     cases(8).dk_grad          = 0;
     cases(8).a0_grad_dBcm_mm  = 0;
     cases(8).a3_grad_dBcm_mm  = 0;
-    % Two-segment width taper: L1_um activates segmented mode
-    cases(8).taper.lam_PM_0_nm  = 450.0;   % perfect PM at waveguide input
-    cases(8).taper.L1_um        = 800;      % segment 1 length [um]
-    cases(8).taper.dw_per_mm_1  = 10.0;    % width taper rate in seg1 [nm/mm]
-    cases(8).taper.dw_per_mm_2  =  0.0;    % seg2: width stops changing
-    cases(8).taper.dlam_PM_dw   = -0.012;  % shared width PM sensitivity [nm/nm]
+    % Two-segment width taper: L1_um activates segmented mode.
+    % Specify actual widths [nm] at three points — input, seg boundary, output.
+    cases(8).taper.lam_PM_0_nm  = 450.0;   % PM wavelength at waveguide input [nm]
+    cases(8).taper.L1_um        = 800;      % segment 1 fixed length [um]
+    cases(8).taper.w_start_nm   = 300;      % width at z=0 (input) [nm]
+    cases(8).taper.w_L1_nm      = 310;      % width at seg1/seg2 boundary [nm]
+    cases(8).taper.w_end_nm     = 310;      % width at waveguide output [nm]
+    cases(8).taper.dlam_PM_dw   = -0.012;  % width PM sensitivity [nm/nm]
     cases(8).taper.dh_per_mm    =  3.0;    % height taper: global [nm/mm]
     cases(8).taper.dlam_PM_dh   =  0.22;   % height PM sensitivity [nm/nm]
 
@@ -267,7 +274,12 @@ function SHG_Design_Suite_v3_3()
             fprintf('  Two-segment taper: L1 = %d um\n', cfg.phys.L1_um);
             fprintf('    Seg1: dk(0)=%.4e  dk(L1)=%.4e  dk_grad_1=%.3e rad/um^2\n', ...
                     cfg.phys.dk_center, dk_at_L1, cfg.phys.dk_grad);
-            fprintf('    Seg2: dk_grad_2=%.3e rad/um^2\n', cfg.phys.dk_grad_2);
+            if isfield(cfg.phys, 'w_end_nm') && ~isempty(cfg.phys.w_end_nm)
+                fprintf('    Seg2: w: %.0f nm -> %.0f nm  (dk_grad_2 computed per L)\n', ...
+                        cfg.phys.w_L1_nm, cfg.phys.w_end_nm);
+            else
+                fprintf('    Seg2: dk_grad_2=%.3e rad/um^2\n', cfg.phys.dk_grad_2);
+            end
         elseif cfg.phys.dk_grad ~= 0
             dk_end = cfg.phys.dk_center + cfg.phys.dk_grad * sweep_vals(end);
             fprintf('  dk_grad = %.3e rad/um^2   =>  dk(z=0) = %.4e,  dk(z=%.0fum) = %.4e rad/um\n', ...
@@ -425,10 +437,25 @@ function [Pg, Ps] = run_core_simulation(cfg)
     end
 
     if isfield(cfg.phys, 'L1_um') && ~isempty(cfg.phys.L1_um)
+        L1 = cfg.phys.L1_um;
+
+        % Seg2 dk_grad: width-endpoint spec computes per current L; old dw_per_mm spec is pre-stored.
+        if isfield(cfg.phys, 'w_end_nm') && ~isempty(cfg.phys.w_end_nm)
+            L2 = cfg.phys.L_um - L1;
+            if L2 > 0
+                dw_mm_2 = (cfg.phys.w_end_nm - cfg.phys.w_L1_nm) / (L2 * 1e-3);
+            else
+                dw_mm_2 = 0;
+            end
+            dk_grad_2 = cfg.phys.dk_grad_h + cfg.phys.C_scale_dw * dw_mm_2;
+        else
+            dk_grad_2 = cfg.phys.dk_grad_2;
+        end
+
         [Pg, Ps] = rk4_engine_segmented( ...
-            cfg.phys.L_um, cfg.phys.L1_um, cfg.sim.dz, cfg.phys.g, ...
+            cfg.phys.L_um, L1, cfg.sim.dz, cfg.phys.g, ...
             a0, a0_grad, a3t, a3t_grad, as, a3s_grad, ...
-            cfg.phys.dk_center, cfg.phys.dk_grad, cfg.phys.dk_grad_2, Pp);
+            cfg.phys.dk_center, cfg.phys.dk_grad, dk_grad_2, Pp);
     else
         [Pg, Ps] = rk4_engine( ...
             cfg.phys.L_um, cfg.sim.dz, cfg.phys.g, ...
@@ -544,12 +571,14 @@ end
 %    dlam_PM_dz = (dlam_PM_dh*dh_per_mm + dlam_PM_dw*dw_per_mm) * 1e-3  [nm/um]
 %    sets cases(k).dk_center and cases(k).dk_grad
 %
-%  Two-segment (L1_um present in taper struct):
-%    Height taper is global; width taper differs between segments.
-%    dlam_PM_dz_seg1 = (dlam_PM_dh*dh_per_mm + dlam_PM_dw*dw_per_mm_1) * 1e-3
-%    dlam_PM_dz_seg2 = (dlam_PM_dh*dh_per_mm + dlam_PM_dw*dw_per_mm_2) * 1e-3
-%    sets cases(k).dk_center, cases(k).dk_grad (seg1), cases(k).dk_grad_2 (seg2),
-%    and cases(k).L1_um (triggers two-segment dispatch in run_core_simulation).
+%  Two-segment, width-endpoint spec (preferred): L1_um + w_start_nm/w_L1_nm/w_end_nm
+%    Seg1 rate derived from (w_L1_nm - w_start_nm) / L1_um — fixed since L1 is constant.
+%    Seg2 rate deferred: stored as dk_grad_h + C_scale_dw factors so run_core_simulation
+%    can recompute dk_grad_2 per-L (seg2 length = L - L1 varies across the sweep).
+%    Sets: cases(k).dk_center, dk_grad (seg1), L1_um, w_L1_nm, w_end_nm, dk_grad_h, C_scale_dw.
+%
+%  Two-segment, rate spec (legacy): L1_um + dw_per_mm_1 + dw_per_mm_2
+%    Both dk_grad values pre-computed; sets cases(k).dk_grad_2 directly.
 % =========================================================================
 function cases = resolve_taper_params(cases, dk_tune)
     any_taper = false;
@@ -574,23 +603,48 @@ function cases = resolve_taper_params(cases, dk_tune)
 
         if isfield(t, 'L1_um') && ~isempty(t.L1_um)
             % --- Two-segment width taper ---
-            dlam_dz_h  = t.dlam_PM_dh * t.dh_per_mm * 1e-3;                    % height contribution [nm/um], global
-            dlam_dz_1  = dlam_dz_h + t.dlam_PM_dw * t.dw_per_mm_1 * 1e-3;     % seg1 total [nm/um]
-            dlam_dz_2  = dlam_dz_h + t.dlam_PM_dw * t.dw_per_mm_2 * 1e-3;     % seg2 total [nm/um]
+            dlam_dz_h = t.dlam_PM_dh * t.dh_per_mm * 1e-3;   % height contribution [nm/um], global
 
-            dk_grd_1 = -C_scale * dlam_dz_1;
-            dk_grd_2 = -C_scale * dlam_dz_2;
+            if isfield(t, 'w_start_nm')
+                % Width-endpoint spec: actual widths at input, boundary, and output.
+                % Seg1 rate is fixed (L1 is constant); seg2 rate is deferred to run_core_simulation.
+                dw_mm_1   = (t.w_L1_nm - t.w_start_nm) / (t.L1_um * 1e-3);   % [nm/mm]
+                dlam_dz_1 = dlam_dz_h + t.dlam_PM_dw * dw_mm_1 * 1e-3;
+                dk_grd_1  = -C_scale * dlam_dz_1;
 
-            cases(k).dk_center = dk_ctr;
-            cases(k).dk_grad   = dk_grd_1;
-            cases(k).dk_grad_2 = dk_grd_2;
-            cases(k).L1_um     = t.L1_um;
+                cases(k).dk_center  = dk_ctr;
+                cases(k).dk_grad    = dk_grd_1;
+                cases(k).L1_um      = t.L1_um;
+                cases(k).w_L1_nm    = t.w_L1_nm;
+                cases(k).w_end_nm   = t.w_end_nm;
+                cases(k).dk_grad_h  = -C_scale * dlam_dz_h;         % height-only dk gradient [rad/um^2]
+                cases(k).C_scale_dw = -C_scale * t.dlam_PM_dw * 1e-3;  % width factor [rad/um^2 per nm/mm]
 
-            fprintf('  Case %d (%s):  [two-segment]\n', k, cases(k).name);
-            fprintf('    lam_PM_0 = %.2f nm  =>  dk_center = %.4e rad/um\n', t.lam_PM_0_nm, dk_ctr);
-            fprintf('    Seg1 (L1=%d um):   dlam_PM/dz = %.4f nm/mm  =>  dk_grad_1 = %.4e rad/um^2\n', t.L1_um, dlam_dz_1*1e3, dk_grd_1);
-            fprintf('    Seg2 (remainder): dlam_PM/dz = %.4f nm/mm  =>  dk_grad_2 = %.4e rad/um^2\n', dlam_dz_2*1e3, dk_grd_2);
-            fprintf('    C_scale = %.4e rad/(um*nm)\n', C_scale);
+                fprintf('  Case %d (%s):  [two-segment, width endpoint]\n', k, cases(k).name);
+                fprintf('    lam_PM_0 = %.2f nm  =>  dk_center = %.4e rad/um\n', t.lam_PM_0_nm, dk_ctr);
+                fprintf('    Seg1 (L1=%d um): w %.0f->%.0f nm  dw=%.2f nm/mm  =>  dk_grad_1 = %.4e rad/um^2\n', ...
+                        t.L1_um, t.w_start_nm, t.w_L1_nm, dw_mm_1, dk_grd_1);
+                fprintf('    Seg2: w %.0f->%.0f nm  (dk_grad_2 computed per L at runtime)\n', ...
+                        t.w_L1_nm, t.w_end_nm);
+                fprintf('    C_scale = %.4e rad/(um*nm)\n', C_scale);
+            else
+                % Legacy rate spec: dw_per_mm_1 and dw_per_mm_2 (pre-computable).
+                dlam_dz_1 = dlam_dz_h + t.dlam_PM_dw * t.dw_per_mm_1 * 1e-3;
+                dlam_dz_2 = dlam_dz_h + t.dlam_PM_dw * t.dw_per_mm_2 * 1e-3;
+                dk_grd_1  = -C_scale * dlam_dz_1;
+                dk_grd_2  = -C_scale * dlam_dz_2;
+
+                cases(k).dk_center = dk_ctr;
+                cases(k).dk_grad   = dk_grd_1;
+                cases(k).dk_grad_2 = dk_grd_2;
+                cases(k).L1_um     = t.L1_um;
+
+                fprintf('  Case %d (%s):  [two-segment, rate spec]\n', k, cases(k).name);
+                fprintf('    lam_PM_0 = %.2f nm  =>  dk_center = %.4e rad/um\n', t.lam_PM_0_nm, dk_ctr);
+                fprintf('    Seg1 (L1=%d um):   dlam_PM/dz = %.4f nm/mm  =>  dk_grad_1 = %.4e rad/um^2\n', t.L1_um, dlam_dz_1*1e3, dk_grd_1);
+                fprintf('    Seg2 (remainder): dlam_PM/dz = %.4f nm/mm  =>  dk_grad_2 = %.4e rad/um^2\n', dlam_dz_2*1e3, dk_grd_2);
+                fprintf('    C_scale = %.4e rad/(um*nm)\n', C_scale);
+            end
         else
             % --- Single segment (v3.2 behavior) ---
             dlam_PM_dz = (t.dlam_PM_dh * t.dh_per_mm + t.dlam_PM_dw * t.dw_per_mm) * 1e-3;
