@@ -57,180 +57,74 @@ function SHG_Design_Suite_v3_3()
 
     %% --- 2. CASE DEFINITIONS ---
 
+    defaults.duty_factor      = 1.0;
+    defaults.lam_nm           = 450;
+    defaults.d33_pmV          = 7.0;
+    defaults.n_pump           = 2.05;
+    defaults.n_shg            = 2.05;
+    defaults.overlap_eta      = 0.0152;
+    defaults.width_um         = 0.300;
+    defaults.height_um        = 0.335;
+    defaults.OCE              = 0.15;
+    defaults.uv_loss_mode     = 'multiplier';
+    defaults.uv_loss_val      = 10;
+    defaults.dk_center        = 0;
+    defaults.dk_grad          = 0;
+    defaults.a0_grad_dBcm_mm  = 0;
+    defaults.a3_grad_dBcm_mm  = 0;
+
     % --- CASE 1 ---
-    cases(1).name             = 'Benchtop RunF (Avo#5)';
-    cases(1).Pp_avg_mW        = 10 * 0.05 * 0.8;
-    cases(1).duty_factor      = 4e-5;
-    cases(1).lam_nm           = 450;
-    cases(1).d33_pmV          = 7.0;
-    cases(1).n_pump           = 2.05;
-    cases(1).n_shg            = 2.05;
-    cases(1).overlap_eta      = 0.0152;
-    cases(1).width_um         = 0.300;
-    cases(1).height_um        = 0.335;
-    cases(1).OCE              = 0.15;
-    cases(1).uv_loss_mode     = 'multiplier';
-    cases(1).uv_loss_val      = 10;
-    cases(1).dk_center        = 10;
-    cases(1).dk_grad          = 0;
-    cases(1).a0_grad_dBcm_mm  = 0;
-    cases(1).a3_grad_dBcm_mm  = 0;
+    cases(1) = defaults;
+    cases(1).name        = 'Benchtop RunF (Avo#5)';
+    cases(1).Pp_avg_mW   = 10 * 0.05 * 0.8;
+    cases(1).duty_factor = 4e-5;
 
     % --- CASE 2 ---
-    cases(2).name             = 'Gen 0 Pkg';
-    cases(2).Pp_avg_mW        = 200 * 0.6 * 0.8;
-    cases(2).duty_factor      = 1.0;
-    cases(2).lam_nm           = 450;
-    cases(2).d33_pmV          = 7.0;
-    cases(2).n_pump           = 2.05;
-    cases(2).n_shg            = 2.05;
-    cases(2).overlap_eta      = 0.0152;
-    cases(2).width_um         = 0.300;
-    cases(2).height_um        = 0.335;
-    cases(2).OCE              = 0.15;
-    cases(2).uv_loss_mode     = 'multiplier';
-    cases(2).uv_loss_val      = 10;
-    cases(2).dk_center        = 0;
-    cases(2).dk_grad          = 0;
-    cases(2).a0_grad_dBcm_mm  = 0;
-    cases(2).a3_grad_dBcm_mm  = 0;
-    cases(2).taper.lam_PM_0_nm = 450.0;
-    cases(2).taper.dlam_PM_dh  = 0.22;
-    cases(2).taper.dlam_PM_dw  = -0.012;
-    cases(2).taper.dh_per_mm   = 3.0;
-    cases(2).taper.dw_per_mm   = 0.0;
+    cases(2) = defaults;
+    cases(2).name      = 'Gen 0 Pkg';
+    cases(2).Pp_avg_mW = 200 * 0.6 * 0.8;
 
     % --- CASE 3 ---
-    cases(3).name             = 'Pump Laser: 600mW';
-    cases(3).Pp_avg_mW        = 600 * 0.6 * 0.8;
-    cases(3).duty_factor      = 1.0;
-    cases(3).lam_nm           = 450;
-    cases(3).d33_pmV          = 7.0;
-    cases(3).n_pump           = 2.05;
-    cases(3).n_shg            = 2.05;
-    cases(3).overlap_eta      = 0.0152;
-    cases(3).width_um         = 0.300;
-    cases(3).height_um        = 0.335;
-    cases(3).OCE              = 0.15;
-    cases(3).uv_loss_mode     = 'multiplier';
-    cases(3).uv_loss_val      = 10;
-    cases(3).dk_center        = 0;
-    cases(3).dk_grad          = 0;
-    cases(3).a0_grad_dBcm_mm  = -10;
-    cases(3).a3_grad_dBcm_mm  = 0;
+    cases(3) = defaults;
+    cases(3).name            = 'Pump Laser: 600mW';
+    cases(3).Pp_avg_mW       = 600 * 0.6 * 0.8;
+    cases(3).a0_grad_dBcm_mm = -10;
 
     % --- CASE 4 ---
-    cases(4).name             = 'Input Coupling Improvement (60% -> 80%)';
-    cases(4).Pp_avg_mW        = 600 * 0.8 * 0.8;
-    cases(4).duty_factor      = 1.0;
-    cases(4).lam_nm           = 450;
-    cases(4).d33_pmV          = 7.0;
-    cases(4).n_pump           = 2.05;
-    cases(4).n_shg            = 2.05;
-    cases(4).overlap_eta      = 0.0152;
-    cases(4).width_um         = 0.300;
-    cases(4).height_um        = 0.335;
-    cases(4).OCE              = 0.15;
-    cases(4).uv_loss_mode     = 'multiplier';
-    cases(4).uv_loss_val      = 10;
-    cases(4).dk_center        = 0;
-    cases(4).dk_grad          = 0;
-    cases(4).a0_grad_dBcm_mm  = -10;
-    cases(4).a3_grad_dBcm_mm  = 0;
+    cases(4) = defaults;
+    cases(4).name            = 'Input Coupling Improvement (60% -> 80%)';
+    cases(4).Pp_avg_mW       = 600 * 0.8 * 0.8;
+    cases(4).a0_grad_dBcm_mm = -10;
 
     % --- CASE 5 ---
-    cases(5).name             = 'Input Facet ARC';
-    cases(5).Pp_avg_mW        = 600 * 0.8 * 1.0;
-    cases(5).duty_factor      = 1.0;
-    cases(5).lam_nm           = 450;
-    cases(5).d33_pmV          = 7.0;
-    cases(5).n_pump           = 2.05;
-    cases(5).n_shg            = 2.05;
-    cases(5).overlap_eta      = 0.0152;
-    cases(5).width_um         = 0.300;
-    cases(5).height_um        = 0.335;
-    cases(5).OCE              = 0.15;
-    cases(5).uv_loss_mode     = 'multiplier';
-    cases(5).uv_loss_val      = 10;
-    cases(5).dk_center        = 0;
-    cases(5).dk_grad          = 0;
-    cases(5).a0_grad_dBcm_mm  = 0;
-    cases(5).a3_grad_dBcm_mm  = 0;
+    cases(5) = defaults;
+    cases(5).name      = 'Input Facet ARC';
+    cases(5).Pp_avg_mW = 600 * 0.8 * 1.0;
 
     % --- CASE 6 ---
-    cases(6).name             = 'Pulsing (2x)';
-    cases(6).Pp_avg_mW        = 1200 * 0.8 * 1.0;
-    cases(6).duty_factor      = 1.0;
-    cases(6).lam_nm           = 450;
-    cases(6).d33_pmV          = 7.0;
-    cases(6).n_pump           = 2.05;
-    cases(6).n_shg            = 2.05;
-    cases(6).overlap_eta      = 0.0152;
-    cases(6).width_um         = 0.300;
-    cases(6).height_um        = 0.335;
-    cases(6).OCE              = 0.15;
-    cases(6).uv_loss_mode     = 'multiplier';
-    cases(6).uv_loss_val      = 10;
-    cases(6).dk_center        = 0;
-    cases(6).dk_grad          = 0;
-    cases(6).a0_grad_dBcm_mm  = 0;
-    cases(6).a3_grad_dBcm_mm  = 0;
+    cases(6) = defaults;
+    cases(6).name      = 'Pulsing (2x)';
+    cases(6).Pp_avg_mW = 1200 * 0.8 * 1.0;
 
     % --- CASE 7: single-segment height taper (v3.2 reference) ---
-    cases(7).name             = 'Output Coupler';
-    cases(7).Pp_avg_mW        = 1200 * 0.8 * 1.0;
-    cases(7).duty_factor      = 1.0;
-    cases(7).lam_nm           = 450;
-    cases(7).d33_pmV          = 7.0;
-    cases(7).n_pump           = 2.05;
-    cases(7).n_shg            = 2.05;
-    cases(7).overlap_eta      = 0.0152;
-    cases(7).width_um         = 0.300;
-    cases(7).height_um        = 0.335;
-    cases(7).OCE              = 0.85;
-    cases(7).uv_loss_mode     = 'multiplier';
-    cases(7).uv_loss_val      = 10;
-    cases(7).dk_center        = 0;
-    cases(7).dk_grad          = 0;
-    cases(7).a0_grad_dBcm_mm  = 0;
-    cases(7).a3_grad_dBcm_mm  = 0;
-    %cases(7).taper.lam_PM_0_nm = 450.0;
-    %cases(7).taper.dlam_PM_dh  = 0.22;
-    %cases(7).taper.dlam_PM_dw  = -0.012;
-    %cases(7).taper.dh_per_mm   = 3.0;
-    %cases(7).taper.dw_per_mm   = 0.0;
+    cases(7) = defaults;
+    cases(7).name      = 'Output Coupler';
+    cases(7).Pp_avg_mW = 1200 * 0.8 * 1.0;
+    cases(7).OCE       = 0.85;
 
-    % --- CASE 8: two-segment width taper (v3.3 new feature) ---
-    % Segment 1 (L1=800um): combined height + width chirp
-    % Segment 2 (remainder): height chirp only (width taper stops at L1)
-    % This demonstrates the piecewise taper: seg1 varies width, seg2 continues
-    % with only the global height taper.
-    cases(8).name             = 'Two-Segment Width Taper';
-    cases(8).Pp_avg_mW        = 1200 * 0.8 * 1.0;
-    cases(8).duty_factor      = 1.0;
-    cases(8).lam_nm           = 450;
-    cases(8).d33_pmV          = 7.0;
-    cases(8).n_pump           = 2.05;
-    cases(8).n_shg            = 2.05;
-    cases(8).overlap_eta      = 0.0152;
-    cases(8).width_um         = 0.300;
-    cases(8).height_um        = 0.335;
-    cases(8).OCE              = 0.85;
-    cases(8).uv_loss_mode     = 'multiplier';
-    cases(8).uv_loss_val      = 10;
-    cases(8).dk_center        = 0;
-    cases(8).dk_grad          = 0;
-    cases(8).a0_grad_dBcm_mm  = 0;
-    cases(8).a3_grad_dBcm_mm  = 0;
-    % Two-segment width taper: L1_um activates segmented mode.
-    % Specify actual widths [nm] at three points — input, seg boundary, output.
+    % --- CASE 8: two-segment width taper ---
+    cases(8) = defaults;
+    cases(8).name      = 'Two-Segment Width Taper';
+    cases(8).Pp_avg_mW = 1200 * 0.8 * 1.0;
+    cases(8).OCE       = 0.85;
+    % Specify widths [nm] at key points; L1_um activates segmented mode.
     cases(8).taper.lam_PM_0_nm  = 450.0;   % PM wavelength at waveguide input [nm]
-    cases(8).taper.L1_um        = 800;      % segment 1 fixed length [um]
-    cases(8).taper.w_start_nm   = 300;      % width at z=0 (input) [nm]
-    cases(8).taper.w_L1_nm      = 310;      % width at seg1/seg2 boundary [nm]
-    cases(8).taper.w_end_nm     = 310;      % width at waveguide output [nm]
+    cases(8).taper.L1_um        = 350;      % segment 1 fixed length [um]
+    cases(8).taper.w_start_nm   = 2500;      % width at z=0 (input) [nm]
+    cases(8).taper.w_L1_nm      = 300;      % width at seg1/seg2 boundary [nm]
+    cases(8).taper.w_end_nm     = 300;      % width at waveguide output [nm]
     cases(8).taper.dlam_PM_dw   = -0.012;  % width PM sensitivity [nm/nm]
-    cases(8).taper.dh_per_mm    =  3.0;    % height taper: global [nm/mm]
+    cases(8).taper.dh_per_mm    =  0;    % height taper: global [nm/mm]
     cases(8).taper.dlam_PM_dh   =  0.22;   % height PM sensitivity [nm/nm]
 
     %% --- 3. LOSS SWEEP CONFIGURATION ---
