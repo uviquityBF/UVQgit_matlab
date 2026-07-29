@@ -57,6 +57,8 @@ function SHG_Design_Suite_v3_3()
 
     %% --- 2. CASE DEFINITIONS ---
 
+    defaults.name             = '';
+    defaults.Pp_avg_mW        = 0;
     defaults.duty_factor      = 1.0;
     defaults.lam_nm           = 450;
     defaults.d33_pmV          = 7.0;
