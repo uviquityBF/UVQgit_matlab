@@ -37,6 +37,20 @@ function SHG_Design_Suite()
 %   - Accumulated phase Phi(z) = dk_center*z + 0.5*dk_grad*z^2
 %   - Scattered SHG tracking via RK4 state Y(5)
 %   - PM tuning curves, loss sweep, interactive evaluation
+%
+% RELATED SCRIPTS IN THIS FOLDER:
+%   SHG_Design_Suite_v2_1.m    -- kept for reference only, not maintained. Last
+%                                 version with a working numeric-vs-analytic
+%                                 validation path (separate g_numeric/g_analytic,
+%                                 run_validation_plot). Simpler: one case, no
+%                                 z-dependent gradients/taper, no dispersion table.
+%                                 Uses exp(+i*dk*z) phase convention.
+%   SHG_Efficiency_w_Scatter.m -- a different kind of study: sweeps pump
+%                                 wavelength detuning (not length/loss) to compare
+%                                 guided vs. scattered SHG phase-matching bandwidth.
+%                                 Shares this script's RK4 engine (helpers/shg/)
+%                                 but keeps its own, less-precise g-coefficient
+%                                 constants -- not directly comparable number-for-number.
 
     close all; clear; clc;
     addpath('G:\My Drive\Analyses(BF)\Matlab\UVQgit\helpers\shg');
@@ -61,12 +75,12 @@ function SHG_Design_Suite()
     defaults.name             = '';
     defaults.Pp_avg_mW        = 0;
     defaults.duty_factor      = 1.0;
-    defaults.lam_nm           = 450;
+    defaults.lam_nm           = 458;
     defaults.d33_pmV          = 7.0;
     defaults.n_pump           = 2.05;
     defaults.n_shg            = 2.05;
     defaults.overlap_eta      = 0.0152;
-    defaults.width_um         = 0.300;
+    defaults.width_um         = 0.400;
     defaults.height_um        = 0.335;
     defaults.OCE              = 0.15;
     defaults.uv_loss_mode     = 'multiplier';
@@ -121,11 +135,11 @@ function SHG_Design_Suite()
     cases(8).Pp_avg_mW = 1200 * 0.8 * 1.0;
     cases(8).OCE       = 0.85;
     % Specify widths [nm] at key points; L1_um activates segmented mode.
-    cases(8).taper.lam_PM_0_nm  = 450.0;   % PM wavelength at waveguide input [nm]
+    cases(8).taper.lam_PM_0_nm  = 458.0;   % pump WL at which dk=0 for the cases(k).width_um geometry [nm]
     cases(8).taper.L1_um        = 350;      % segment 1 fixed length [um]
-    cases(8).taper.w_start_nm   = 300;      % width at z=0 (input) [nm]
-    cases(8).taper.w_L1_nm      = 300;      % width at seg1/seg2 boundary [nm]
-    cases(8).taper.w_end_nm     = 300;      % width at waveguide output [nm]
+    cases(8).taper.w_start_nm   = 2500;      % width at z=0 (input) [nm]
+    cases(8).taper.w_L1_nm      = 400;      % width at seg1/seg2 boundary [nm]
+    cases(8).taper.w_end_nm     = 400;      % width at waveguide output [nm]
     cases(8).taper.dlam_PM_dw   = -0.012;  % width PM sensitivity [nm/nm]
     cases(8).taper.dh_per_mm    =  0;    % height taper: global [nm/mm]
     cases(8).taper.dlam_PM_dh   =  0.22;   % height PM sensitivity [nm/nm]
