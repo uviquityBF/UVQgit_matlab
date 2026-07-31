@@ -47,8 +47,10 @@ function cases = shg_resolve_taper_params(cases, dk_tune)
                 cases(k).dk_center  = dk_ctr;
                 cases(k).dk_grad    = dk_grd_1;
                 cases(k).L1_um      = t.L1_um;
+                cases(k).w_start_nm = t.w_start_nm;  % width at z=0, for g(z)
                 cases(k).w_L1_nm    = t.w_L1_nm;
                 cases(k).w_end_nm   = t.w_end_nm;
+                cases(k).dh_per_um  = t.dh_per_mm * 1e-3;  % height taper rate [nm/um], for g(z)
                 cases(k).dk_grad_h  = -C_scale * dlam_dz_h;         % height-only dk gradient [rad/um^2]
                 cases(k).C_scale_dw = -C_scale * t.dlam_PM_dw * 1e-3;  % width factor [rad/um^2 per nm/mm]
 
