@@ -1,7 +1,18 @@
 function SHG_Efficiency_w_Scatter()
     % SHG_Master_Consolidated: RK4 Solver for TM00-TM04 SHG in AlN
     % Handles: Scattering vs. Guided power, spectral broadening, and absorption.
-    
+    %
+    % NOT a length/loss sweep like SHG_Design_Suite.m -- this sweeps pump
+    % wavelength DETUNING at one fixed geometry/length, to compare the
+    % phase-matching bandwidth (FWHM) of guided vs. scattered SHG. Reports
+    % the FWHM broadening factor as the headline result.
+    %
+    % Shares SHG_Design_Suite.m's RK4 engine (helpers/shg/shg_rk4_engine.m),
+    % but its own g-coefficient formula uses less-precise physical constants
+    % (c=3e8, eps0=8.85e-12 vs. 2.998e8/8.854e-12) -- left as-is during
+    % cleanup rather than silently changed, so its numbers won't exactly
+    % match SHG_Design_Suite.m's at identical nominal inputs.
+
     close all; clear;
     addpath('G:\My Drive\Analyses(BF)\Matlab\UVQgit\helpers\shg');
 
@@ -46,6 +57,11 @@ function SHG_Efficiency_w_Scatter()
     A_eff = cfg.geo.width_um * cfg.geo.height_um;
     g_coeff = sqrt( cfg.shg.overlap_frac^2 / A_eff * prefactor );
 
+    % Build geom struct for shg_rk4_engine (uniform waveguide, g pre-computed above).
+    % g_override bypasses shg_local_g so this script's g formula is preserved exactly.
+    geom = struct('w_start_nm', cfg.geo.width_um*1000, 'w_end_nm', cfg.geo.width_um*1000, ...
+                  'h0_nm', cfg.geo.height_um*1000, 'dh_per_um', 0, 'g_override', g_coeff);
+
     %% 3. BANDWIDTH STUDY (Loop over Detuning)
     P_guided_detune = zeros(size(detuning_list));
     P_scat_detune = zeros(size(detuning_list));
@@ -68,7 +84,7 @@ function SHG_Efficiency_w_Scatter()
             for w_idx = 1:length(wl_spectrum)
                 % Add the offset from the pump's internal spectrum
                 dk_offset = (4*pi / (cfg.pump.lam_nm * 1e-7)) * (wl_spectrum(w_idx) * cfg.geo.dispersion_slope) * 1e-4;
-                [pg, ps] = shg_rk4_engine(cfg.geo.L_um, cfg.sim.dz, g_coeff, ...
+                [pg, ps] = shg_rk4_engine(cfg.geo.L_um, cfg.sim.dz, geom, ...
                     a0, 0, a3_total, 0, a3_scat, 0, dk_um + dk_offset, 0, Pp);
                 p_g_temp = p_g_temp + pg * weights(w_idx);
                 p_s_temp = p_s_temp + ps * weights(w_idx);
@@ -77,7 +93,7 @@ function SHG_Efficiency_w_Scatter()
             P_scat_detune(k) = p_s_temp;
         else
             % --- Case B: Monochromatic (Instant) ---
-            [P_guided_detune(k), P_scat_detune(k)] = shg_rk4_engine(cfg.geo.L_um, cfg.sim.dz, g_coeff, ...
+            [P_guided_detune(k), P_scat_detune(k)] = shg_rk4_engine(cfg.geo.L_um, cfg.sim.dz, geom, ...
                 a0, 0, a3_total, 0, a3_scat, 0, dk_um, 0, Pp);
         end
     end

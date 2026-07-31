@@ -8,6 +8,11 @@ function g = shg_local_g(w_nm, h_nm, geom)
 %
 % This is the same physics as shg_g_coefficient, but accepts explicit geometry
 % at a point so it can be called per-step for z-dependent g(z) simulation.
+    if isfield(geom, 'g_override') && ~isempty(geom.g_override)
+        g = geom.g_override;
+        return;
+    end
+
     eps0   = 8.854e-12;
     c      = 2.998e8;
     lam1   = geom.lam_nm * 1e-9;
