@@ -15,6 +15,7 @@ function FP_Linewidth_Analysis()
 
     %% --- USER SETTINGS ---
     csv_file         = 'G:\Shared drives\Corp Main\Engineering\LAB EXPERIMENTS\2026_07_20_LabData\linewidth measurment\sa200-3B\DLPro_at_250mA\Dlpro-sa2003b-test2_2026-07-21_0_192721.csv'; 
+    csv_file         = 'G:\Shared drives\Corp Main\Engineering\LAB EXPERIMENTS\2026_07_20_LabData\linewidth measurment\sa200-3B\DLPro_w_BScube\Dlpro-test28.csv';
     % full path to the MXO44 CSV file
     FSR_GHz          = 1.5;            % SA200-3B free spectral range (GHz)
 
@@ -23,7 +24,7 @@ function FP_Linewidth_Analysis()
     min_sep_ms       = 0.5;            % min time between adjacent peaks (ms)
 
     % Which two peaks to analyze — set after viewing the overview plot
-    peak_indices    = [1, 2];          % [left_peak, right_peak] by time order
+    peak_indices    = [2, 4];          % [left_peak, right_peak] by time order
 
     % Optional time window to restrict the view (ms). Leave [] for full waveform.
     t_window_ms     = [];              % e.g. [2.0, 8.0]
