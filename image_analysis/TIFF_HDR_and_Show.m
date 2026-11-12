@@ -19,8 +19,13 @@ function TIFF_HDR_and_Show()
     SatLimit_DN = 255;
     
     IMAGE_ROTATION_DEG = 0;
-    
-     
+
+    % Image scale at the sample plane [um per pixel]. SET THIS for each dataset -- it is
+    % saved into the _HDR.mat so downstream scripts (e.g. the modal-decomposition spot
+    % importer) know the calibration. NaN = unknown.
+    um_per_pixel = NaN;
+
+
     %select files to plot
 %     [IMGfile_list,IMGpath,dummy] = uigetfile({'*.tiff'},'Select DATA File to ','MultiSelect','on');
     [IMGfile_list,IMGpath,dummy] = uigetfile({'*.PNG'},'Select DATA File to ','MultiSelect','on');
@@ -103,8 +108,11 @@ function TIFF_HDR_and_Show()
 %      grid on;  xlabel('pixels');
     
     % SAVE FILES
+    if isnan(um_per_pixel)
+        warning('TIFF_HDR_and_Show:scale', 'um_per_pixel is NaN: the saved _HDR.mat has no image calibration. Set um_per_pixel at the top of this function.');
+    end
     save([filename_base,'_HDR.mat'],'I_HDR','scale_factors','file_names',...
-                'Texp_list','file_order_Texp','Texp_sortedlist', 'Isum', 'file_order', 'sortedsums');
+                'Texp_list','file_order_Texp','Texp_sortedlist', 'Isum', 'file_order', 'sortedsums', 'um_per_pixel');
     csvwrite([filename_base,'_HDR.csv'],I_HDR);
     
     imwrite(uint16(I_HDR),[filename_base,'_HDR.tiff'],'tiff')

@@ -14,7 +14,8 @@ function S = load_comsol_mode_set(filepath, unit_scale_to_um)
 % Returns struct array S(1..nModes), in FILE order, with fields:
 %   x, y        coordinates in um (column vectors, shared by all modes)
 %   Ex, Ey      complex transverse fields (column vectors)
-%   neff        value parsed from the header tag (NaN if not found)
+%   neff        real part of the effective index parsed from the header tag (NaN if not found)
+%   neff_imag   imaginary part if the tag is complex (leaky mode), else 0
 %   hasEy       false if the imag(Ey) column was missing/duplicated in the export
 %               (then Ey is set to zero and must not be used)
 
@@ -54,7 +55,7 @@ function S = load_comsol_mode_set(filepath, unit_scale_to_um)
         error('Data block in %s has %d columns, header lists %d.', filepath, size(D, 2), nCols);
     end
 
-    S = struct('x', cell(nM, 1), 'y', [], 'Ex', [], 'Ey', [], 'neff', [], 'hasEy', []);
+    S = struct('x', cell(nM, 1), 'y', [], 'Ex', [], 'Ey', [], 'neff', [], 'neff_imag', [], 'hasEy', []);
     x = D(:, 1) * unit_scale_to_um;
     y = D(:, 2) * unit_scale_to_um;
     for k = 1:nM
@@ -66,7 +67,8 @@ function S = load_comsol_mode_set(filepath, unit_scale_to_um)
         end
         hasEy = ~isempty(regexp(h{3}, '^real\(.*\.Ey\)', 'once')) && ...
                 ~isempty(regexp(h{4}, '^imag\(.*\.Ey\)', 'once'));
-        tk = regexp(h{1}, '@\s*([0-9.]+)', 'tokens', 'once');
+        % solution tag: "2.1151" or complex "1.7773-3.2622E-4i" (leaky mode)
+        tk = regexp(h{1}, '@\s*([0-9.]+)(?:([+-][0-9.]+(?:[Ee][+-]?\d+)?)i)?', 'tokens', 'once');
 
         S(k).x = x;  S(k).y = y;
         S(k).Ex = D(:, c + 1) + 1i * D(:, c + 2);
@@ -77,6 +79,8 @@ function S = load_comsol_mode_set(filepath, unit_scale_to_um)
         end
         S(k).hasEy = hasEy;
         if isempty(tk), S(k).neff = NaN; else, S(k).neff = str2double(tk{1}); end
+        S(k).neff_imag = 0;
+        if ~isempty(tk) && numel(tk) > 1 && ~isempty(tk{2}), S(k).neff_imag = str2double(tk{2}); end
     end
     if any(~[S.hasEy])
         warning('load_comsol_mode_set:noEy', ...

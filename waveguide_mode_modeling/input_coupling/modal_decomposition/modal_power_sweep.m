@@ -26,6 +26,8 @@ sweep.dy_um     = -1:0.1:1;          % 1-D sweep of y offset  ([] to skip)
 sweep.dz_um     = -3:0.5:3;          % 1-D sweep of defocus   ([] to skip)
 sweep.map_dx_um = -2:0.25:2;         % 2-D map: x offsets     ([] to skip the map)
 sweep.map_dy_um = -0.8:0.1:0.8;      %          y offsets
+sweep.mfd_x_um  = 0.6:0.2:3.0;       % 2-D map over Gaussian mode field diameter (1/e^2 intensity, um)
+sweep.mfd_y_um  = 0.3:0.1:1.5;       %   x / y  ([] to skip; always uses a Gaussian spot, whatever cfg.spot_source is)
 sweep.base_dz   = 0;                 % defocus held fixed for the offset sweeps / map
 sweep.n_lines   = 6;                 % number of strongest modes drawn in the line plots
 
@@ -92,6 +94,25 @@ if doMap
     end
 end
 
+%% ---------------- MODE FIELD DIAMETER MAP (Gaussian spot) ----------------
+doMfd = ~isempty(sweep.mfd_x_um) && ~isempty(sweep.mfd_y_um);
+if doMfd
+    gx = sweep.mfd_x_um;  gy = sweep.mfd_y_um;
+    G1 = zeros(numel(gy), numel(gx));  GH = G1;  GU = G1;
+    for iy = 1:numel(gy)
+        for ix = 1:numel(gx)
+            cfgG = cfg;  cfgG.gauss.mfd_x_um = gx(ix);  cfgG.gauss.mfd_y_um = gy(iy);
+            P2 = modal_set_spot(P, make_gaussian_spot(cfgG));
+            sh = cfg.beam_offset_um;  if cfg.align_centroids, sh = sh + P2.align_shift; end
+            f = mode_fracs(P2, M, W, Pm, sh, sweep.base_dz, cfg.extra_phase_fn);
+            G1(iy, ix) = f(1);  GH(iy, ix) = sum(f(2:end));  GU(iy, ix) = max(0, 1 - sum(f));
+        end
+    end
+    [bestG, ib] = max(G1(:));  [iyb, ixb] = ind2sub(size(G1), ib);
+    fprintf('MFD map: best coupling into the fundamental = %.1f %% at MFD x = %.2f, y = %.2f %sm (of %d x %d points)\n', ...
+            100 * bestG, gx(ixb), gy(iyb), um, numel(gx), numel(gy));
+end
+
 %% ---------------- PLOTS ----------------
 tags = P.modeTag;
 for k = 1:nM
@@ -135,6 +156,19 @@ if doMap
         xlabel(['x offset (' um 'm)']); ylabel(['y offset (' um 'm)']); title(ttl{s});
     end
     sgtitle(sprintf('Beam offset map (dz = %.2f %sm)', sweep.base_dz, um));
+end
+
+if doMfd
+    figure('Color', 'w', 'Position', [80 80 1500 420], 'Name', 'MFD map');
+    data = {100 * G1, 100 * GH, 100 * GU};
+    ttl  = {'Fundamental mode (m01) (%)', 'All higher-order modes (%)', 'Unaccounted (%)'};
+    for q = 1:3
+        subplot(1, 3, q);
+        imagesc(gx, gy, data{q}); set(gca, 'YDir', 'normal'); colorbar; colormap(gca, parula);  hold on;
+        plot(gx(ixb), gy(iyb), 'w*', 'MarkerSize', 9);
+        xlabel(['MFD x (' um 'm)']); ylabel(['MFD y (' um 'm)']); title(ttl{q});
+    end
+    sgtitle(sprintf('Gaussian spot, power vs mode field diameter  (white * = best fundamental coupling, %.1f %%)', 100 * bestG));
 end
 
 %% ---------------- SAVE ----------------

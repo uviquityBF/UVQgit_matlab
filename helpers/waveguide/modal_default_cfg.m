@@ -6,6 +6,7 @@ function cfg = modal_default_cfg(cfg_override)
 %   cfg = modal_default_cfg();
 %   cfg = modal_default_cfg(struct('mode_file', 'C:\...\modes.csv'));
 
+    cfg.spot_source        = 'zemax'; % 'zemax' | 'gaussian' | 'measured'  (see load_input_spot)
     cfg.zemax_unit_to_um   = 1000;    % Zemax POP axes are in lens units (mm -> 1000)
     cfg.comsol_unit_to_um  = [];      % [] = read from COMSOL header / assume um; or 1, 1e-3 (nm)
     cfg.pol_component      = 'Ey';    % input assumed vertically polarized -> Ey ('Ex'|'Ey'|'auto')
@@ -21,6 +22,13 @@ function cfg = modal_default_cfg(cfg_override)
     cfg.default_dir_irrad  = 'G:\Shared drives\Corp Main\Engineering\Design & SHG Analysis (Brent)\facet_coupling\input_data';
     cfg.default_dir_modes  = 'G:\Shared drives\Corp Main\Engineering\Design & SHG Analysis (Brent)\facet_coupling\input_data';
     cfg.max_montage_modes  = 16;
+    % spot_source = 'gaussian': coherent elliptical Gaussian from its mode field diameter
+    cfg.gauss = struct('mfd_x_um', 1.0, 'mfd_y_um', 1.0, 'm2', 1, 'lambda_um', 0.45, ...
+                       'window_um', 12, 'n_pts', 1024);
+    % spot_source = 'measured': intensity image (HDR .mat / tiff / png / csv); see load_measured_spot
+    cfg.measured = struct('file', '', 'um_per_pixel', [], 'background', 'auto', 'noise_sigma', 3, ...
+                          'crop_um', [6 6], 'rot90', 0, 'flip_x', false, 'flip_y', false, ...
+                          'var_name', '', 'lambda_um', 0.45);
     % Optional presets -- leave '' to be prompted with file dialogs
     cfg.irrad_file    = '';           % full path to Zemax POP irradiance .txt
     cfg.phase_file    = '';           % full path to POP phase .txt, or 'none' for flat phase
