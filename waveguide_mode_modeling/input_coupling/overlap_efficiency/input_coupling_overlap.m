@@ -40,7 +40,7 @@ function input_coupling_overlap()
 
     %% calculate overlap
     overlap_matrix  = ( A.I_HDR.*Z ) / sum(A.I_HDR(:))*sum(Z(:));
-    overlap = sum(overlap_matrix(:));
+    overlap = sum(overlap_matrix(:))
 
 end
 

@@ -19,3 +19,6 @@ slprj/
 temp.m
 *~
 *.log
+
+# Large measurement/simulation inputs (COMSOL exports ~170 MB each; GitHub limit is 100 MB)
+waveguide_mode_modeling/input_coupling/input_data/

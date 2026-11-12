@@ -5,7 +5,9 @@ addpath('G:\My Drive\Analyses(BF)\Matlab\UVQgit\helpers\waveguide');
 clear; clc; close all;
 
 % Setup default directory if it exists
-default_path = 'G:\Shared drives\uvq-Avo [external]\Gen 1 Product\NECSEL';
+default_path = 'G:\Shared drives\uvq-Avo [external]\Gen 1 Product\Optical Design\NECSEL';
+irrad_path = 'G:\Shared drives\uvq-Avo [external]\Gen 1 Product\Optical Design\NECSEL\data_from_NECSEL\2623 Uviquity update'
+wg_mode_path = 'G:\Shared drives\uvq-Avo [external]\Gen 1 Product\Optical Design\NECSEL\target mode_profiles_TM00_v_hornwidth';
 if exist(default_path, 'dir'), cd(default_path); end
 
 %% ==========================================
@@ -14,6 +16,7 @@ if exist(default_path, 'dir'), cd(default_path); end
 fprintf('--- Step 1: Loading Zemax POP Data ---\n');
 
 % 1a. Load Zemax Irradiance File
+if exist(irrad_path, 'dir'), cd(irrad_path); end
 [fileI, pathI] = uigetfile('*.txt', 'Select the Zemax POP IRRADIANCE File');
 if isequal(fileI,0), disp('Operation canceled.'); return; end
 POP_I = load_zemax_pop_txt(fullfile(pathI, fileI));
@@ -38,6 +41,7 @@ zY = POP_I.y_axis;
 %% ==========================================
 fprintf('\n--- Step 2: Loading COMSOL Waveguide Data ---\n');
 
+if exist(wg_mode_path, 'dir'), cd(wg_mode_path); end
 [fileC, pathC] = uigetfile({'*.txt;*.dat'}, 'Select the COMSOL Waveguide Export File');
 if isequal(fileC,0), disp('Operation canceled.'); return; end
 
