@@ -69,14 +69,25 @@ end
 % Fig 1: input field
 figure('Color', 'w', 'Position', [50 50 1100 420], 'Name', 'Input spot');
 subplot(1, 2, 1);
-imagesc(intX, intY, abs(E_in).^2); axis image; set(gca, 'YDir', 'normal'); colorbar; colormap(gca, jet);
-xlabel(['X (' um 'm)']); ylabel(['Y (' um 'm)']); title('Input irradiance on window'); hold on;
-contour(intX, intY, abs(E_modes(:, :, 1)).^2, 3, 'w');
+I_in = abs(E_in).^2;
+imagesc(intX, intY, I_in); axis image; set(gca, 'YDir', 'normal'); colorbar; colormap(gca, jet);
+cl = caxis;                                   % lock the colour scale to the input spot
+xlabel(['X (' um 'm)']); ylabel(['Y (' um 'm)']); title('Input irradiance (white = fundamental mode)'); hold on;
+I_m1 = abs(E_modes(:, :, 1)).^2 + abs(E_other(:, :, 1)).^2;
+contour(intX, intY, I_m1 / max(I_m1(:)), [0.135 0.5], 'w');   % mode contours at 1/e^2 and 50 % (own scale)
+caxis(cl);
+% zoom to where either the spot or the mode has > 1 % of its peak
+roi = (I_in > 0.01 * max(I_in(:))) | (I_m1 > 0.01 * max(I_m1(:)));
+cc = find(any(roi, 1));  rr = find(any(roi, 2));
+padx = 0.3 * (intX(cc(end)) - intX(cc(1)));  pady = 0.3 * (intY(rr(end)) - intY(rr(1)));
+roiX = [intX(cc(1)) - padx, intX(cc(end)) + padx];  roiY = [intY(rr(1)) - pady, intY(rr(end)) + pady];
+xlim(roiX);  ylim(roiY);
 subplot(1, 2, 2);
 ph = angle(E_in);  ph(abs(E_in).^2 < 0.01 * max(abs(E_in(:)).^2)) = NaN;
 imagesc(intX, intY, ph, 'AlphaData', ~isnan(ph)); axis image; set(gca, 'YDir', 'normal');
 colorbar; colormap(gca, hsv); caxis([-pi pi]);
 xlabel(['X (' um 'm)']); ylabel(['Y (' um 'm)']); title('Input phase (rad), >1% intensity');
+xlim(roiX);  ylim(roiY);
 
 % Fig 2: bar chart
 labels = cell(nM + 1, 1);
