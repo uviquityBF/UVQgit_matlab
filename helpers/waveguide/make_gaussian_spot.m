@@ -40,6 +40,7 @@ function spot = make_gaussian_spot(cfg)
     spot.P_in_total = sum(abs(E(:)).^2) * (x(2) - x(1)) * (y(2) - y(1));
     spot.cx_in = 0;  spot.cy_in = 0;
     spot.lambda_um = lam * m2;          % effective propagation wavelength (M2 scales the divergence)
+    spot.lambda_nominal_um = lam;       % true vacuum wavelength (for the mode-wavelength check)
     spot.n_medium = 1;
     spot.name = sprintf('Gaussian MFD %.2f x %.2f um (M2=%.2f)', mfd_x, mfd_y, m2);
 end

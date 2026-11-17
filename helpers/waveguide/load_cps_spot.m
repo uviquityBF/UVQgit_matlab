@@ -33,11 +33,7 @@ function spot = load_cps_spot(cfg, which)
     if ~isfield(c, 'folder') || isempty(c.folder) || ~exist(c.folder, 'dir')
         error('cfg.%s.folder does not exist: %s', fld, getopt(c, 'folder', '(not set)'));
     end
-    if ~strcmp(which, '450')
-        warning('load_cps_spot:wavelength', ...
-            ['%s nm spot: the COMSOL mode sets are solved at 450 nm, so a modal decomposition ' ...
-             'of this spot against them is NOT physically meaningful (use it for beam characterization).'], which);
-    end
+    % (The spot-vs-mode wavelength check is done in load_modal_problem, which sees the mode file.)
     pix   = getopt(c, 'um_per_pixel', []);
     if isempty(pix), error('cfg.%s.um_per_pixel must be set.', fld); end
     zsel  = getopt(c, 'z_select', 'auto');

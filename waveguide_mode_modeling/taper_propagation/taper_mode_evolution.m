@@ -32,7 +32,9 @@ cfg.n_substrate    = 1.8;            % sapphire
 cfg.n_clad_top     = 1.48;           % SiO2
 cfg.drop_leaky     = true;           % true: Re(neff) < max(n_sub, n_clad) => radiated (removed)
                                      % false: keep them, using Im(neff) as attenuation
-cfg.lambda_mode_um = 0.45;           % wavelength of the COMSOL modes (for the phases)
+cfg.lambda_mode_um = [];             % wavelength of the COMSOL modes (for the phases). [] = read from the
+                                     % "wl=<nm>nm" tag in the file names (0.45 if untagged); a number also
+                                     % selects that wavelength if the folder mixes several
 cfg.crop_x_um      = [-5 5];         % crop window for the overlaps (um)
 cfg.crop_y_um      = [-3 3];
 cfg.w_start_um     = [2.5];          % taper starting width;   [] = widest exported width
@@ -68,8 +70,17 @@ if isempty(cfg.mode_dir)
     if isequal(cfg.mode_dir, 0), disp('Canceled.'); return; end
 end
 opts = struct('n_cut', n_cut, 'drop_leaky', cfg.drop_leaky, ...
-              'crop_x_um', cfg.crop_x_um, 'crop_y_um', cfg.crop_y_um);
-[W, ~] = load_mode_width_series(cfg.mode_dir, opts);
+              'crop_x_um', cfg.crop_x_um, 'crop_y_um', cfg.crop_y_um, 'wavelength_um', cfg.lambda_mode_um);
+[W, gridinfo] = load_mode_width_series(cfg.mode_dir, opts);
+if isempty(cfg.lambda_mode_um)
+    if isnan(gridinfo.lambda_um)
+        cfg.lambda_mode_um = 0.45;
+        fprintf('Mode wavelength: no "wl=<nm>nm" tag in the file names, assuming 450 nm.\n');
+    else
+        cfg.lambda_mode_um = gridinfo.lambda_um;
+        fprintf('Mode wavelength: %.0f nm (from the file names).\n', 1000 * cfg.lambda_mode_um);
+    end
+end
 
 if ~isempty(cfg.w_start_um), W = W([W.width_um] <= cfg.w_start_um + 1e-9); end
 if ~isempty(cfg.w_end_um),   W = W([W.width_um] >= cfg.w_end_um - 1e-9);   end

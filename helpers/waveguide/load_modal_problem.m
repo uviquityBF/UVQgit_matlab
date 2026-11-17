@@ -58,6 +58,7 @@ if strcmp(src, 'Single combined file')
     for k = 1:nM, modes{k} = S(k); end
     modeSetName = fileM;
     fprintf('  %d modes, %d points each, neff %.4f ... %.4f\n', nM, numel(S(1).x), neff(1), neff(end));
+    mode_lambda_um = parse_mode_wavelength(fileM);
 else
     modeDir = uigetdir(start, 'Select directory of COMSOL mode files (one geometry)');
     if isequal(modeDir, 0), disp('Canceled.'); P = []; return; end
@@ -91,6 +92,28 @@ else
     end
     hasEy = true(nM, 1);
     modeSetName = modeDir;
+    [~, dirName] = fileparts(modeDir);
+    mode_lambda_um = parse_mode_wavelength(dirName);
+    if isnan(mode_lambda_um), mode_lambda_um = parse_mode_wavelength(files(1).name); end
+end
+
+% ---- wavelength the modes were solved at (file-name tag "wl=<nm>nm", else cfg.mode_lambda_um) ----
+if isnan(mode_lambda_um)
+    mode_lambda_um = getfield_or(cfg, 'mode_lambda_um', NaN);
+    if isnan(mode_lambda_um)
+        fprintf('  Mode wavelength: unknown (no "wl=<nm>nm" in the file name, cfg.mode_lambda_um empty)\n');
+    else
+        fprintf('  Mode wavelength: %.0f nm (from cfg.mode_lambda_um)\n', 1000 * mode_lambda_um);
+    end
+else
+    fprintf('  Mode wavelength: %.0f nm (from the file name)\n', 1000 * mode_lambda_um);
+end
+lam_spot = lambda_um;
+if isfield(spot, 'lambda_nominal_um'), lam_spot = spot.lambda_nominal_um; end
+if ~isnan(mode_lambda_um) && abs(lam_spot - mode_lambda_um) > 0.01
+    warning('load_modal_problem:wavelength', ...
+        ['Input spot wavelength (%.0f nm) differs from the wavelength the modes were solved at (%.0f nm): ' ...
+         'the overlap is not physically meaningful.'], 1000 * lam_spot, 1000 * mode_lambda_um);
 end
 
 %% ---------------- 3. COMMON INTEGRATION GRID ----------------
@@ -168,7 +191,11 @@ P = struct('zX', zX, 'zY', zY, 'E_native', E_native, 'lambda_um', lambda_um, ...
     'E_modes', E_modes, 'E_other', E_other, 'neff', neff, 'modeIdx', modeIdx, ...
     'modeTag', {modeTag}, 'polFrac', polFrac, 'pol', pol, ...
     'align_shift', [cx_m - cx_in, cy_m - cy_in], 'mode_centroid', [cx_m, cy_m], ...
-    'fileI', fileI, 'modeSetName', modeSetName, 'nM', nM);
+    'fileI', fileI, 'modeSetName', modeSetName, 'nM', nM, 'mode_lambda_um', mode_lambda_um);
+end
+
+function v = getfield_or(s, name, default)
+    if isfield(s, name) && ~isempty(s.(name)), v = s.(name); else, v = default; end
 end
 
 function [nx, ny] = count_nodes(E)

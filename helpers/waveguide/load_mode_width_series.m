@@ -16,6 +16,10 @@ function [W, gridinfo] = load_mode_width_series(mode_dir, opts)
 %                 false: keep them and use Im(neff) from the header as loss (default true)
 %   crop_x_um     [xmin xmax] crop window (default [-5 5])
 %   crop_y_um     [ymin ymax]               (default [-3 3])
+%   wavelength_um only load files tagged wl=<nm>nm with this wavelength (untagged files are
+%                 kept); required if the folder mixes several wavelengths (default [] = all)
+% File names may carry the wavelength the modes were solved at, e.g.
+%   modeData_wl=450nm__N=20__h=350nm__w=2500nm.csv   (see parse_mode_wavelength)
 %
 % W(i), sorted from the WIDEST to the narrowest width:
 %   width_um, file
@@ -26,7 +30,8 @@ function [W, gridinfo] = load_mode_width_series(mode_dir, opts)
 %   keep_idx  indices of the kept modes within the original descending-neff list
 %   n_all, n_dropped, neff_all (Re(neff) of ALL modes in the file, descending)
 %   cx_um, cy_um   intensity centroid of the fundamental mode (alignment check)
-% gridinfo: struct with x, y (cropped axes, um), nx, ny
+% gridinfo: struct with x, y (cropped axes, um), nx, ny, lambda_um (mode wavelength from the
+%           file names, NaN if untagged)
 
     if nargin < 2, opts = struct(); end
     n_cut      = getopt(opts, 'n_cut', 1.8);
@@ -42,6 +47,21 @@ function [W, gridinfo] = load_mode_width_series(mode_dir, opts)
     end
     files = files(~isnan(width));  width = width(~isnan(width));
     if isempty(files), error('No mode files with "w=<number>nm" in the name found in %s', mode_dir); end
+
+    % ---- wavelength tag "wl=<number>nm" (files without a tag are accepted as-is) ----
+    wl = arrayfun(@(f) parse_mode_wavelength(f.name), files);
+    want = getopt(opts, 'wavelength_um', []);
+    if ~isempty(want)
+        keep = isnan(wl) | abs(wl - want) < 1e-6;
+        if ~any(keep), error('No mode files with wl=%.0fnm in %s', 1000 * want, mode_dir); end
+        files = files(keep);  width = width(keep);  wl = wl(keep);
+    end
+    wl_tags = unique(wl(~isnan(wl)));
+    if numel(wl_tags) > 1
+        error(['%s holds mode files for several wavelengths (%s nm); set opts.wavelength_um ' ...
+               '(cfg.lambda_mode_um in taper_mode_evolution) to pick one.'], mode_dir, num2str(1000 * wl_tags'));
+    end
+    if isempty(wl_tags), lam_modes = NaN; else, lam_modes = wl_tags; end
     [width, order] = sort(width, 'descend');  files = files(order);
     if any(diff(width) == 0), error('Duplicate widths in %s', mode_dir); end
 
@@ -99,6 +119,7 @@ function [W, gridinfo] = load_mode_width_series(mode_dir, opts)
         W(i).polFrac = pol(keep);  W(i).keep_idx = keep;
         W(i).n_all = nAll;  W(i).n_dropped = nAll - numel(keep);  W(i).neff_all = nre;
     end
+    gridinfo.lambda_um = lam_modes;       % wavelength from the "wl=<nm>nm" file-name tag (NaN if none)
 end
 
 function v = getopt(s, name, default)

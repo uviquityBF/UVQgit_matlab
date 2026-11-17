@@ -30,7 +30,7 @@ function cfg = modal_default_cfg(cfg_override)
                           'crop_um', [6 6], 'rot90', 0, 'flip_x', false, 'flip_y', false, ...
                           'var_name', '', 'lambda_um', 0.45);
     % spot_source = 'cps450' | 'cps532' | 'cps635': through-focus series of that CPS laser's focused
-    % beam; the smallest beam is used. (532/635 are for beam characterization only: the modes are 450 nm.)
+    % beam; the smallest beam is used. (The mode wavelength comes from "wl=<nm>nm" in the mode file name.)
     % (see load_cps_spot). um_per_pixel 0.193 = fit through the origin of 5 calibration targets
     % (individual points scatter by about +-9 %) -- update when the rear-camera calibration is redone.
     % Orientation confirmed (Nov 2026): image vertical = chip y (0.35 um thickness) -> rot90 = 0.
@@ -43,6 +43,7 @@ function cfg = modal_default_cfg(cfg_override)
     cfg.cps635 = struct('folder', 'G:\Shared drives\Corp Main\Engineering\LAB EXPERIMENTS\2026_11_09_LabData\CPS Reference Images\635', ...
                      'um_per_pixel', 0.193, 'z_select', 'auto', 'min_peak', 30, 'sat_level', 250, ...
                      'max_halfwidth_um', 25, 'crop_um', [15 15], 'rot90', 0, 'lambda_um', 0.635, 'plot', true);
+    cfg.mode_lambda_um = [];          % COMSOL mode wavelength (um); used only if the mode file name has no "wl=<nm>nm" tag
     % Optional presets -- leave '' to be prompted with file dialogs
     cfg.irrad_file    = '';           % full path to Zemax POP irradiance .txt
     cfg.phase_file    = '';           % full path to POP phase .txt, or 'none' for flat phase

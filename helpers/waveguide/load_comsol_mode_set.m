@@ -40,7 +40,7 @@ function S = load_comsol_mode_set(filepath, unit_scale_to_um)
     nM = (nCols - 2) / 4;
 
     if nargin < 2 || isempty(unit_scale_to_um)
-        u = '';  tk = regexp(unitLine, 'Length unit,\s*(.*)$', 'tokens', 'once');
+        u = '';  tk = regexp(unitLine, 'Length unit[,:]\s*(.*)$', 'tokens', 'once');
         if ~isempty(tk), u = strtrim(tk{1}); end
         if strcmp(u, 'nm'), unit_scale_to_um = 1e-3;
         elseif strcmp(u, 'mm'), unit_scale_to_um = 1e3;
@@ -68,7 +68,9 @@ function S = load_comsol_mode_set(filepath, unit_scale_to_um)
         hasEy = ~isempty(regexp(h{3}, '^real\(.*\.Ey\)', 'once')) && ...
                 ~isempty(regexp(h{4}, '^imag\(.*\.Ey\)', 'once'));
         % solution tag: "2.1151" or complex "1.7773-3.2622E-4i" (leaky mode)
-        tk = regexp(h{1}, '@\s*([0-9.]+)(?:([+-][0-9.]+(?:[Ee][+-]?\d+)?)i)?', 'tokens', 'once');
+        % (two separate patterns: one regexp with an optional imaginary group returned only the real part)
+        tk  = regexp(h{1}, '@\s*([0-9.]+)', 'tokens', 'once');
+        tki = regexp(h{1}, '@\s*[0-9.]+([+-][0-9.]+(?:[Ee][+-]?\d+)?)i', 'tokens', 'once');
 
         S(k).x = x;  S(k).y = y;
         S(k).Ex = D(:, c + 1) + 1i * D(:, c + 2);
@@ -80,7 +82,7 @@ function S = load_comsol_mode_set(filepath, unit_scale_to_um)
         S(k).hasEy = hasEy;
         if isempty(tk), S(k).neff = NaN; else, S(k).neff = str2double(tk{1}); end
         S(k).neff_imag = 0;
-        if ~isempty(tk) && numel(tk) > 1 && ~isempty(tk{2}), S(k).neff_imag = str2double(tk{2}); end
+        if ~isempty(tki), S(k).neff_imag = str2double(tki{1}); end
     end
     if any(~[S.hasEy])
         warning('load_comsol_mode_set:noEy', ...
