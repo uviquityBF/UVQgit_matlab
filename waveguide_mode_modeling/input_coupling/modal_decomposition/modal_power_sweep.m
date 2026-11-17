@@ -19,6 +19,8 @@ addpath(fullfile(fileparts(mfilename('fullpath')), '..', '..', '..', 'helpers', 
 
 %% ---------------- USER SETTINGS ----------------
 cfg = modal_default_cfg();
+cfg.spot_source = 'cps532';
+
 cfg.grid_n = 501;                    % coarser than the single-run script: speed (sweeps loop a lot)
 
 sweep.dx_um     = -3:0.25:3;         % 1-D sweep of x offset  ([] to skip)

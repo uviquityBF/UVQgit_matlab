@@ -6,6 +6,9 @@ function spot = load_input_spot(cfg)
 %                                 cfg.irrad_file / cfg.phase_file)
 %                     'gaussian'  coherent Gaussian from its mode field diameter (cfg.gauss)
 %                     'measured'  intensity image such as an HDR composite (cfg.measured)
+%                     'cps450' | 'cps532' | 'cps635'
+%                                 through-focus camera series of that CPS laser; picks the
+%                                 smallest beam (cfg.cps450 / cfg.cps532 / cfg.cps635)
 %
 % Returned fields
 %   zX, zY        native-grid axes (um)           E_native  complex field [ny x nx]
@@ -21,7 +24,9 @@ function spot = load_input_spot(cfg)
         case 'zemax',    spot = load_zemax_spot(cfg);
         case 'gaussian', spot = make_gaussian_spot(cfg);
         case 'measured', spot = load_measured_spot(cfg);
-        otherwise, error('cfg.spot_source must be ''zemax'', ''gaussian'' or ''measured'' (got "%s").', src);
+        case {'cps450', 'cps532', 'cps635'}, spot = load_cps_spot(cfg, src(4:end));
+        case 'cps',      spot = load_cps_spot(cfg, '450');      % older name for cps450
+        otherwise, error('cfg.spot_source must be ''zemax'', ''gaussian'', ''measured'', ''cps450'', ''cps532'' or ''cps635'' (got "%s").', src);
     end
     if isempty(spot), return; end
     fprintf('Input centroid: (%.2f, %.2f) %sm\n', spot.cx_in, spot.cy_in, um);

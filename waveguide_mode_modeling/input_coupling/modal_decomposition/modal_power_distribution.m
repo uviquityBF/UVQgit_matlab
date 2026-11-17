@@ -23,6 +23,7 @@ addpath(fullfile(fileparts(mfilename('fullpath')), '..', '..', '..', 'helpers', 
 
 %% ---------------- USER SETTINGS (defaults in modal_default_cfg.m) ----------------
 cfg = modal_default_cfg();
+cfg.spot_source = 'cps532';
 % e.g.  cfg.beam_offset_um = [0.5 0];   cfg.defocus_um = 3;   cfg.pol_component = 'Ey';
 if exist('cfg_override', 'var')   % optional: struct of settings set before running (batch use)
     cfg = modal_default_cfg(cfg_override);

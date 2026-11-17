@@ -6,7 +6,7 @@ function cfg = modal_default_cfg(cfg_override)
 %   cfg = modal_default_cfg();
 %   cfg = modal_default_cfg(struct('mode_file', 'C:\...\modes.csv'));
 
-    cfg.spot_source        = 'zemax'; % 'zemax' | 'gaussian' | 'measured'  (see load_input_spot)
+    cfg.spot_source        = 'measured'; % 'zemax' | 'gaussian' | 'measured' | 'cps450' | 'cps532' | 'cps635'  (see load_input_spot)
     cfg.zemax_unit_to_um   = 1000;    % Zemax POP axes are in lens units (mm -> 1000)
     cfg.comsol_unit_to_um  = [];      % [] = read from COMSOL header / assume um; or 1, 1e-3 (nm)
     cfg.pol_component      = 'Ey';    % input assumed vertically polarized -> Ey ('Ex'|'Ey'|'auto')
@@ -23,12 +23,26 @@ function cfg = modal_default_cfg(cfg_override)
     cfg.default_dir_modes  = 'G:\Shared drives\Corp Main\Engineering\Design & SHG Analysis (Brent)\facet_coupling\input_data';
     cfg.max_montage_modes  = 16;
     % spot_source = 'gaussian': coherent elliptical Gaussian from its mode field diameter
-    cfg.gauss = struct('mfd_x_um', 1.0, 'mfd_y_um', 1.0, 'm2', 1, 'lambda_um', 0.45, ...
+    cfg.gauss = struct('mfd_x_um', 2.0, 'mfd_y_um', 2.0, 'm2', 1, 'lambda_um', 0.45, ...
                        'window_um', 12, 'n_pts', 1024);
     % spot_source = 'measured': intensity image (HDR .mat / tiff / png / csv); see load_measured_spot
     cfg.measured = struct('file', '', 'um_per_pixel', [], 'background', 'auto', 'noise_sigma', 3, ...
                           'crop_um', [6 6], 'rot90', 0, 'flip_x', false, 'flip_y', false, ...
                           'var_name', '', 'lambda_um', 0.45);
+    % spot_source = 'cps450' | 'cps532' | 'cps635': through-focus series of that CPS laser's focused
+    % beam; the smallest beam is used. (532/635 are for beam characterization only: the modes are 450 nm.)
+    % (see load_cps_spot). um_per_pixel 0.193 = fit through the origin of 5 calibration targets
+    % (individual points scatter by about +-9 %) -- update when the rear-camera calibration is redone.
+    % Orientation confirmed (Nov 2026): image vertical = chip y (0.35 um thickness) -> rot90 = 0.
+    cfg.cps450 = struct('folder', 'G:\Shared drives\Corp Main\Engineering\LAB EXPERIMENTS\2026_11_09_LabData\CPS Reference Images\450', ...
+                     'um_per_pixel', 0.193, 'z_select', 'auto', 'min_peak', 30, 'sat_level', 250, ...
+                     'max_halfwidth_um', 25, 'crop_um', [15 15], 'rot90', 0, 'lambda_um', 0.45, 'plot', true);
+    cfg.cps532 = struct('folder', 'G:\Shared drives\Corp Main\Engineering\LAB EXPERIMENTS\2026_11_09_LabData\CPS Reference Images\532', ...
+                     'um_per_pixel', 0.193, 'z_select', 'auto', 'min_peak', 30, 'sat_level', 250, ...
+                     'max_halfwidth_um', 25, 'crop_um', [15 15], 'rot90', 0, 'lambda_um', 0.532, 'plot', true);
+    cfg.cps635 = struct('folder', 'G:\Shared drives\Corp Main\Engineering\LAB EXPERIMENTS\2026_11_09_LabData\CPS Reference Images\635', ...
+                     'um_per_pixel', 0.193, 'z_select', 'auto', 'min_peak', 30, 'sat_level', 250, ...
+                     'max_halfwidth_um', 25, 'crop_um', [15 15], 'rot90', 0, 'lambda_um', 0.635, 'plot', true);
     % Optional presets -- leave '' to be prompted with file dialogs
     cfg.irrad_file    = '';           % full path to Zemax POP irradiance .txt
     cfg.phase_file    = '';           % full path to POP phase .txt, or 'none' for flat phase
